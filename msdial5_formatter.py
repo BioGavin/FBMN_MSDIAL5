@@ -34,9 +34,16 @@ def convert_to_feature_csv(input_filename, output_filename):
     columns_to_keep_indices = list(range(3)) + list(range(class_column_position+1, len(input_format.columns)))
     input_format = input_format.iloc[:, columns_to_keep_indices]
     input_format.columns = ['A', 'B', 'C'] + list(input_format.columns[3:])
-    nan_columns = input_format.columns[input_format.columns.isna()]
-    input_format = input_format.drop(columns=nan_columns)
+    
+    # Ensure column names are strings to avoid errors when comparing
+    input_format.columns = input_format.columns.map(str)
 
+    # Identify columns where the name is 'nan' (as a string)
+    nan_columns = [col for col in input_format.columns if col == 'nan']
+
+    # Drop these columns if any are found
+    if nan_columns:
+        input_format = input_format.drop(columns=nan_columns)
     input_format.columns = input_format.iloc[3]  # Use the third row as header
     input_format = input_format.drop(input_format.index[:4])  # Drop the first three rows
 
