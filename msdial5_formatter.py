@@ -7,6 +7,7 @@ Created on 2024/01/30
 @purpose: to convert the MS-DIAL v5 file into a FBMN diserable format
 """
 import pandas as pd
+import argparse
 import sys
 import os
 
@@ -103,7 +104,23 @@ def convert_mgf(input_filename, output_filename):
     with open(output_filename, 'w') as file:
         file.writelines(new_lines)
 
+def help():
+    parser = argparse.ArgumentParser(
+        description="convert the MS-DIAL v5 file into a FBMN diserable format",
+        epilog=(
+            "usage example:\n"
+            "  python3 msdial5_formatter.py -q input_quant.txt -m input.mgf -Q converted_quant.csv -M converted.mgf"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("-q", "--input_quant", required=True, help="input quant table from MS-DIAL5")
+    parser.add_argument("-m", "--input_mgf", required=True, help="input mgf file from MS-DIAL5")
+    parser.add_argument("-Q", "--output_quant", required=True, help="output converted quant table")
+    parser.add_argument("-M", "--output_mgf", required=True, help="output converted mgf file")
+
+    args = parser.parse_args()
+    return args
 
 if __name__=="__main__":
-    # there should be obly one input file
-    convert_to_feature_csv(sys.argv[1], sys.argv[2])
+    args = help()
+    convert_mgf(args.input_mgf, args.output_mgf)
+    convert_to_feature_csv(args.input_quant, args.output_quant)
